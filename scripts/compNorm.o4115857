@@ -1,0 +1,86 @@
+
+Hi
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_4.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_4.txt 
+[1] "gProcessedSignal.gBGUsed.none.none"
+[1] "gProcessedSignal.gBGUsed.none.scale"
+[1] "gProcessedSignal.gBGUsed.none.quantile"
+[1] "gProcessedSignal.gBGUsed.none.cyclicloess"
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_4.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_4.txt 
+[1] "gMeanSignal.gBGMeanSignal.none.none"
+[1] "gMeanSignal.gBGMeanSignal.none.scale"
+[1] "gMeanSignal.gBGMeanSignal.none.quantile"
+[1] "gMeanSignal.gBGMeanSignal.none.cyclicloess"
+[1] "gMeanSignal.gBGMeanSignal.subtract.none"
+[1] "gMeanSignal.gBGMeanSignal.subtract.scale"
+[1] "gMeanSignal.gBGMeanSignal.subtract.quantile"
+[1] "gMeanSignal.gBGMeanSignal.subtract.cyclicloess"
+[1] "gMeanSignal.gBGMeanSignal.half.none"
+[1] "gMeanSignal.gBGMeanSignal.half.scale"
+[1] "gMeanSignal.gBGMeanSignal.half.quantile"
+[1] "gMeanSignal.gBGMeanSignal.half.cyclicloess"
+[1] "gMeanSignal.gBGMeanSignal.minimum.none"
+[1] "gMeanSignal.gBGMeanSignal.minimum.scale"
+[1] "gMeanSignal.gBGMeanSignal.minimum.quantile"
+[1] "gMeanSignal.gBGMeanSignal.minimum.cyclicloess"
+Array 1 corrected
+Array 2 corrected
+Array 3 corrected
+Array 4 corrected
+Array 5 corrected
+Array 6 corrected
+Array 7 corrected
+Array 8 corrected
+[1] "gMeanSignal.gBGMeanSignal.normexp.none"
+[1] "gMeanSignal.gBGMeanSignal.normexp.scale"
+[1] "gMeanSignal.gBGMeanSignal.normexp.quantile"
+[1] "gMeanSignal.gBGMeanSignal.normexp.cyclicloess"
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_4.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_4.txt 
+[1] "gMedianSignal.gBGMedianSignal.none.none"
+[1] "gMedianSignal.gBGMedianSignal.none.scale"
+[1] "gMedianSignal.gBGMedianSignal.none.quantile"
+[1] "gMedianSignal.gBGMedianSignal.none.cyclicloess"
+[1] "gMedianSignal.gBGMedianSignal.subtract.none"
+[1] "gMedianSignal.gBGMedianSignal.subtract.scale"
+[1] "gMedianSignal.gBGMedianSignal.subtract.quantile"
+[1] "gMedianSignal.gBGMedianSignal.subtract.cyclicloess"
+[1] "gMedianSignal.gBGMedianSignal.half.none"
+[1] "gMedianSignal.gBGMedianSignal.half.scale"
+[1] "gMedianSignal.gBGMedianSignal.half.quantile"
+[1] "gMedianSignal.gBGMedianSignal.half.cyclicloess"
+[1] "gMedianSignal.gBGMedianSignal.minimum.none"
+[1] "gMedianSignal.gBGMedianSignal.minimum.scale"
+[1] "gMedianSignal.gBGMedianSignal.minimum.quantile"
+[1] "gMedianSignal.gBGMedianSignal.minimum.cyclicloess"
+Array 1 corrected
+Array 2 corrected
+Array 3 corrected
+Array 4 corrected
+Array 5 corrected
+Array 6 corrected
+Array 7 corrected
+Array 8 corrected
+[1] "gMedianSignal.gBGMedianSignal.normexp.none"
+[1] "gMedianSignal.gBGMedianSignal.normexp.scale"
+[1] "gMedianSignal.gBGMedianSignal.normexp.quantile"
+[1] "gMedianSignal.gBGMedianSignal.normexp.cyclicloess"

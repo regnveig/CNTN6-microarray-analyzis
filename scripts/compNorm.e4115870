@@ -1,0 +1,15 @@
+Warning messages:
+1: In normalizeBetweenArrays(test_data_bgCor, method = normMethod) :
+  NaNs produced
+2: In normalizeBetweenArrays(test_data_bgCor, method = normMethod) :
+  NaNs produced
+3: In is.data.frame(object) : NaNs produced
+4: In normalizeBetweenArrays(test_data_bgCor, method = normMethod) :
+  NaNs produced
+5: In normalizeBetweenArrays(test_data_bgCor, method = normMethod) :
+  NaNs produced
+6: In is.data.frame(object) : NaNs produced
+Error: unexpected symbol in:
+"save(all_results,file=paste(results_path,"all_results.Robj",sep="/")
+cat"
+Execution halted

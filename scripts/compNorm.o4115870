@@ -1,0 +1,224 @@
+
+Hi
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_4.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_4.txt 
+[1] "gProcessedSignal.gBGUsed.none.none"
+[1] "gProcessedSignal.gBGUsed.none.scale"
+[1] "gProcessedSignal.gBGUsed.none.quantile"
+[1] "gProcessedSignal.gBGUsed.none.cyclicloess"
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_4.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_4.txt 
+[1] "gMeanSignal.gBGMeanSignal.none.none"
+[1] "gMeanSignal.gBGMeanSignal.none.scale"
+[1] "gMeanSignal.gBGMeanSignal.none.quantile"
+[1] "gMeanSignal.gBGMeanSignal.none.cyclicloess"
+[1] "gMeanSignal.gBGMeanSignal.subtract.none"
+[1] "gMeanSignal.gBGMeanSignal.subtract.scale"
+[1] "gMeanSignal.gBGMeanSignal.subtract.quantile"
+[1] "gMeanSignal.gBGMeanSignal.subtract.cyclicloess"
+[1] "gMeanSignal.gBGMeanSignal.half.none"
+[1] "gMeanSignal.gBGMeanSignal.half.scale"
+[1] "gMeanSignal.gBGMeanSignal.half.quantile"
+[1] "gMeanSignal.gBGMeanSignal.half.cyclicloess"
+[1] "gMeanSignal.gBGMeanSignal.minimum.none"
+[1] "gMeanSignal.gBGMeanSignal.minimum.scale"
+[1] "gMeanSignal.gBGMeanSignal.minimum.quantile"
+[1] "gMeanSignal.gBGMeanSignal.minimum.cyclicloess"
+Array 1 corrected
+Array 2 corrected
+Array 3 corrected
+Array 4 corrected
+Array 5 corrected
+Array 6 corrected
+Array 7 corrected
+Array 8 corrected
+[1] "gMeanSignal.gBGMeanSignal.normexp.none"
+[1] "gMeanSignal.gBGMeanSignal.normexp.scale"
+[1] "gMeanSignal.gBGMeanSignal.normexp.quantile"
+[1] "gMeanSignal.gBGMeanSignal.normexp.cyclicloess"
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_4.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_1.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_2.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_3.txt 
+Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_2_4.txt 
+[1] "gMedianSignal.gBGMedianSignal.none.none"
+[1] "gMedianSignal.gBGMedianSignal.none.scale"
+[1] "gMedianSignal.gBGMedianSignal.none.quantile"
+[1] "gMedianSignal.gBGMedianSignal.none.cyclicloess"
+[1] "gMedianSignal.gBGMedianSignal.subtract.none"
+[1] "gMedianSignal.gBGMedianSignal.subtract.scale"
+[1] "gMedianSignal.gBGMedianSignal.subtract.quantile"
+[1] "gMedianSignal.gBGMedianSignal.subtract.cyclicloess"
+[1] "gMedianSignal.gBGMedianSignal.half.none"
+[1] "gMedianSignal.gBGMedianSignal.half.scale"
+[1] "gMedianSignal.gBGMedianSignal.half.quantile"
+[1] "gMedianSignal.gBGMedianSignal.half.cyclicloess"
+[1] "gMedianSignal.gBGMedianSignal.minimum.none"
+[1] "gMedianSignal.gBGMedianSignal.minimum.scale"
+[1] "gMedianSignal.gBGMedianSignal.minimum.quantile"
+[1] "gMedianSignal.gBGMedianSignal.minimum.cyclicloess"
+Array 1 corrected
+Array 2 corrected
+Array 3 corrected
+Array 4 corrected
+Array 5 corrected
+Array 6 corrected
+Array 7 corrected
+Array 8 corrected
+[1] "gMedianSignal.gBGMedianSignal.normexp.none"
+[1] "gMedianSignal.gBGMedianSignal.normexp.scale"
+[1] "gMedianSignal.gBGMedianSignal.normexp.quantile"
+[1] "gMedianSignal.gBGMedianSignal.normexp.cyclicloess"
+$gProcessedSignal.gBGUsed
+$gProcessedSignal.gBGUsed$gProcessedSignal.gBGUsed.none.none
+[1] 5.060213 5.223382 3.906212 2.923162 4.850654 4.501009 3.252326 2.755567
+
+$gProcessedSignal.gBGUsed$gProcessedSignal.gBGUsed.none.scale
+[1] 5.305916 5.293050 1.938783 3.351694 5.286573 3.393189 4.472119 3.431201
+
+$gProcessedSignal.gBGUsed$gProcessedSignal.gBGUsed.none.quantile
+[1] 5.081772 5.055670 1.934182 3.693665 5.167796 3.810252 4.535663 3.764339
+
+$gProcessedSignal.gBGUsed$gProcessedSignal.gBGUsed.none.cyclicloess
+[1] 5.010562 4.988338 2.972126 3.414918 5.134997 3.696647 4.459051 3.534118
+
+
+$gMeanSignal.gBGMeanSignal
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.none.none
+[1] 5.976747 6.083416 5.677247 5.197334 5.878190 5.779026 5.220928 5.163814
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.none.scale
+[1] 6.202947 6.215670 4.826847 5.325238 6.102367 5.419344 5.543648 5.340641
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.none.quantile
+[1] 6.041114 6.003646 5.031756 5.380644 6.087414 5.468674 5.716159 5.406693
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.none.cyclicloess
+[1] 6.157928 6.140473 5.232446 5.461842 6.150483 5.483759 5.759534 5.521716
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.subtract.none
+[1] 5.471495 5.629021 5.022421 4.077893 5.338376 5.171582 4.222906 3.989593
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.subtract.scale
+[1] 5.890895 5.808999 3.612319 4.326612 5.715637 4.461761 4.796595 4.310469
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.subtract.quantile
+[1] 5.565870 5.509873 3.800624 4.494332 5.629297 4.653464 5.050220 4.484942
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.subtract.cyclicloess
+[1] 5.658750 5.599134 4.344879 4.445261 5.664488 4.653795 5.011303 4.511524
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.half.none
+[1] 5.471495 5.629021 5.022421 4.077893 5.338376 5.171582 4.222906 3.989593
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.half.scale
+[1] 5.890895 5.808999 3.612319 4.326612 5.715637 4.461761 4.796595 4.310469
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.half.quantile
+[1] 5.565870 5.509873 3.800624 4.494332 5.629297 4.653464 5.050220 4.484942
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.half.cyclicloess
+[1] 5.658676 5.599051 4.344638 4.445135 5.664371 4.653722 5.011101 4.511343
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.minimum.none
+[1] 5.471495 5.629021 5.022421 4.077893 5.338376 5.171582 4.222906 3.989593
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.minimum.scale
+[1] 5.890895 5.808999 3.612319 4.326612 5.715637 4.461761 4.796595 4.310469
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.minimum.quantile
+[1] 5.565870 5.509873 3.800624 4.494332 5.629297 4.653464 5.050220 4.484942
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.minimum.cyclicloess
+[1] 5.658353 5.598812 4.345050 4.445170 5.664338 4.653881 5.011267 4.511538
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.normexp.none
+[1] 5.396082 5.513899 4.608192 3.932668 5.212918 4.899093 3.846890 3.439941
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.normexp.scale
+[1] 5.708311 5.702122 3.093544 3.981706 5.605674 4.150582 4.638649 3.969095
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.normexp.quantile
+[1] 5.427430 5.365671 3.263126 4.186220 5.497093 4.380786 4.847962 4.174586
+
+$gMeanSignal.gBGMeanSignal$gMeanSignal.gBGMeanSignal.normexp.cyclicloess
+[1] 5.464356 5.429233 3.909058 4.145454 5.501132 4.335317 4.750160 4.083097
+
+
+$gMedianSignal.gBGMedianSignal
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.none.none
+[1] 5.977280 6.149747 5.700440 5.247928 5.882643 5.754888 5.169925 5.169925
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.none.scale
+[1] 6.194370 6.263001 4.875095 5.361182 6.121428 5.394211 5.498908 5.344580
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.none.quantile
+[1] 6.032046 6.044394 5.038919 5.419960 6.084808 5.453271 5.643856 5.405141
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.none.cyclicloess
+[1] 6.135618 6.182088 5.298439 5.503516 6.141248 5.457903 5.709703 5.524856
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.subtract.none
+[1] 5.491853 5.727920 5.087463 4.169925 5.357552 5.129283 4.169925 4.087463
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.subtract.scale
+[1] 5.870159 5.925654 3.714448 4.410727 5.735858 4.437199 4.754681 4.372659
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.subtract.quantile
+[1] 5.564149 5.571753 3.876517 4.546894 5.632995 4.625709 4.982994 4.566054
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.subtract.cyclicloess
+[1] 5.644157 5.665741 4.470607 4.520851 5.659043 4.613449 4.953367 4.600810
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.half.none
+[1] 5.491853 5.727920 5.087463 4.169925 5.357552 5.129283 4.169925 4.087463
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.half.scale
+[1] 5.870159 5.925654 3.714448 4.410727 5.735858 4.437199 4.754681 4.372659
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.half.quantile
+[1] 5.564149 5.571753 3.876517 4.546894 5.632995 4.625709 4.982994 4.566054
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.half.cyclicloess
+[1] 5.644156 5.665736 4.470602 4.520836 5.659010 4.613452 4.953352 4.600790
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.minimum.none
+[1] 5.491853 5.727920 5.087463 4.169925 5.357552 5.129283 4.169925 4.087463
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.minimum.scale
+[1] 5.870159 5.925654 3.714448 4.410727 5.735858 4.437199 4.754681 4.372659
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.minimum.quantile
+[1] 5.564149 5.571753 3.876517 4.546894 5.632995 4.625709 4.982994 4.566054
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.minimum.cyclicloess
+[1] 5.644156 5.665736 4.470602 4.520836 5.659010 4.613452 4.953352 4.600790
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.normexp.none
+[1] 5.427398 5.627093 4.704713 3.844410 5.246254 4.857463 3.807981 3.623484
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.normexp.scale
+[1] 5.657194 5.814505 3.226688 4.093097 5.600579 4.119608 4.571064 4.056061
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.normexp.quantile
+[1] 5.424896 5.433268 3.369360 4.249577 5.500539 4.345839 4.769335 4.273086
+
+$gMedianSignal.gBGMedianSignal$gMedianSignal.gBGMedianSignal.normexp.cyclicloess
+[1] 5.443842 5.496147 4.062646 4.170043 5.484750 4.287508 4.668803 4.217618
+
+
