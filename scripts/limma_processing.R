@@ -1,4 +1,4 @@
-my_loadAndNormalize_data = function(data_path,my_design,infile = NULL,averageDups = T){
+my_loadAndNormalize_data = function(data_path,my_design,infile = NULL,averageDups = T, doDensityPlot = F){
 #Load and normalize data
   if (!is.null(infile)){
      print ("Loading data from file")
@@ -7,17 +7,45 @@ my_loadAndNormalize_data = function(data_path,my_design,infile = NULL,averageDup
 #    load(file=)
   }
   else{
-	  my_data = read.maimages(my_design$FileName,path=data_path,source="agilent",green.only=T)
-	  my_data = backgroundCorrect(my_data,method="normexp")
-	  my_data = normalizeBetweenArrays(my_data,method="quantile")
-	  if (averageDups){
-	    my_data = avereps(my_data,my_data$genes[,"ProbeUID"])
-	  }
-	  return (my_data)
+	my_data = read.maimages(my_design$FileName,path=data_path,source="agilent",green.only=T,
+							names=paste(1:length(my_design$Name),my_design$Name,sep="."))
+	my_data = backgroundCorrect(my_data,method="normexp")
+	if (doDensityPlot){
+		plotDensities(my_data)
+		title("Before")
+	}
+	my_data = normalizeBetweenArrays(my_data,method="quantile")
+	if (averageDups){
+		my_data = avereps(my_data,my_data$genes[,"ProbeUID"])
+	}
+	if (doDensityPlot){
+		plotDensities(my_data)
+		title("After")
+	}
+	return (my_data)
   }	
 }
 
 #################### By genotype comparisons ######################
+
+do_eBayess = function(fit,printDEgenes){
+	eBayess = list()
+	for (trend in c(F,T)) {
+	  for (robust in c(F,T)){
+	    name = paste("trend",as.character(trend),"robust",as.character(robust),sep=".")
+      eBayess[[name]] = eBayes(fit,trend = trend, robust = robust)
+      print (paste("Options trend =",trend,"robust=",robust))
+      print(summary(decideTests(eBayess[[name]],adjust.method="BH",p.value=0.05)))
+      if (printDEgenes) {
+        for (coeff in colnames(eBayess[[name]]$contrasts)){
+          print (paste("Comparison ",coeff))
+          write.table (topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff),sep="\t")
+        }
+      }
+	  }
+	}
+	return(eBayess)
+}
 
 by_genotype_comparisons = function(my_data, printDEgenes=F)
 {
@@ -48,6 +76,7 @@ by_genotype_comparisons = function(my_data, printDEgenes=F)
 
 
 	colnames(my_design_matrix) = levels(my_design$Name)
+	#colnames(my_design_matrix) = c("(Intercept)",levels(my_design$Name))
 
 	#  iTAF1nor25 iTAF1nor36 iTAF2nor24 iTAF3del17
 	#1          0          1          0          0
@@ -66,7 +95,7 @@ by_genotype_comparisons = function(my_data, printDEgenes=F)
 
 
 	PairWizeWTvsDelContrasts <<- makeContrasts(
-  	        vs25 = iTAF1nor25 - iTAF3del17,	  
+						vs25 = iTAF1nor25 - iTAF3del17,
 						vs36 = iTAF1nor36 - iTAF3del17,
 						vs24 =  iTAF2nor24 - iTAF3del17,
 						levels = my_design_matrix)
@@ -74,117 +103,86 @@ by_genotype_comparisons = function(my_data, printDEgenes=F)
 	fit_genotype <<- lmFit(my_data,my_design_matrix)
 
 	fit_genotype_pairs <<- contrasts.fit(fit_genotype,PairWizeWTvsDelContrasts)
-	eBayess <<- list()
-	for (trend in c(F,T)) {
-	  for (robust in c(F,T)){
-	    name = paste("trend",as.character(trend),"robust",as.character(robust),sep=".")
-      eBayess[[name]] <<- eBayes(fit_genotype_pairs,trend = trend, robust = robust)
-      print (paste("Options trend =",trend,"robust=",robust))
-      print(summary(decideTests(eBayess[[name]],adjust.method="BH",p.value=0.05)))
-      if (printDEgenes) {
-        for (coeff in colnames(eBayess[[name]]$contrasts)){
-          print (paste("Comparison ",coeff))
-          write.table (topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff),sep="\t")
-        }
-      }
-	  }
-	}
+	eBayess_by_genotype <<- do_eBayess(fit_genotype_pairs,printDEgenes)
 
 	print ("Compare del with all of wt simultaneously")
-	allNormVSDel <<- makeContrasts(iTAF1nor25+iTAF1nor36+iTAF2nor24-iTAF3del17*3,levels = my_design_matrix)
+	allNormVSDel <<- makeContrasts(iTAF1nor25+iTAF1nor36+iTAF2nor24-(iTAF3del17*3),
+									levels = my_design_matrix)
+									
 	fit_WTvsDEL <<- contrasts.fit(fit_genotype,allNormVSDel)
-	eBayess_WTvsDEL <<- list()
-	for (trend in c(F,T)) {
-	  for (robust in c(F,T)){
-	    name = paste("trend",as.character(trend),"robust",as.character(robust),sep=".")
-	    eBayess_WTvsDEL[[name]] <<- eBayes(fit_WTvsDEL,trend = trend, robust = robust)
-	    print (paste("Options trend =",trend,"robust=",robust))
-	    print(summary(decideTests(eBayess_WTvsDEL[[name]],adjust.method="BH",p.value=0.05)))
-	    if (printDEgenes) {
-	      for (coeff in colnames(fit_WTvsDEL[[name]]$contrasts)){
-	        print (paste("Comparison ",coeff))
-	        write.table (topTable(fit_WTvsDEL[[name]],number=Inf,p.value = 0.05,coef=coeff),sep="\t")
-	      }
-	    }
-	  }
-	}
+	eBayess_WTvsDEL <<- do_eBayess(fit_WTvsDEL,printDEgenes)
 	
 	PairWizeWTvsWTContrasts = makeContrasts(c36vs24 = iTAF1nor36 - iTAF2nor24,
 	                                           c36vs25 = iTAF1nor36 - iTAF1nor25,
 	                                           c25vs24 = iTAF1nor25 - iTAF2nor24,
 	                                           levels = my_design_matrix)
 	fit_genotype_pairs_bwWT = contrasts.fit(fit_genotype,PairWizeWTvsWTContrasts)
-	eBayess_bwWt = list()
-	for (trend in c(F,T)) {
-	  for (robust in c(F,T)){
-	    name = paste("trend",as.character(trend),"robust",as.character(robust),sep=".")
-	    eBayess_bwWt[[name]] = eBayes(fit_genotype_pairs_bwWT,trend = trend, robust = robust)
-	    print (paste("Options trend =",trend,"robust=",robust))
-	    print(summary(decideTests(eBayess_bwWt[[name]],adjust.method="BH",p.value=0.05)))
-#	    if (printDEgenes) {
-#	      for (coeff in colnames(eBayess[[name]]$contrasts)){
-#	        print (paste("Comparison ",coeff))
-#	        write.table (topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff),sep="\t")
-#	      }
-#	    }
-	  }
-	}
-	
+	eBayess_bwWt <<- do_eBayess(fit_genotype_pairs_bwWT,printDEgenes)
 }
 
 #################### WT ws DEL ######################
-wt_vs_del_comparisons = function(my_data){
-	condition = factor(my_design$Condition,levels=c("WT","DEL"))
+wt_vs_del_comparisons = function(my_data,exclude=c(),printDEgenes=FALSE){
+	if (length(exclude) > 0) {
+		data_colnames = colnames(my_data)
+		to_exclude = !(data_colnames %in% exclude)
+		temp_data = my_data
+		temp_data$targets = as.data.frame(my_data$targets[to_exclude,])
+		rownames(temp_data$targets) = rownames(my_data$targets)[to_exclude]
+		colnames(temp_data$targets) = colnames(my_data$targets)
+		temp_data$E = temp_data$E[,to_exclude]
+
+		temp_design = my_design[to_exclude,]
+	}
+	else {
+		temp_data = my_data
+		temp_design = my_design
+	}
+
+	condition = factor(temp_design$Condition,levels=c("WT","DEL"))
 	designWTvsDEL <<- model.matrix(~condition)
-	fit_WTvsDEL2 <<- lmFit(my_data,designWTvsDEL)
-	eBayes_WTvsDEL2_FF <<- eBayes(fit_WTvsDEL2)
-	eBayes_WTvsDEL2_TF <<- eBayes(fit_WTvsDEL2, trend = T)
-	eBayes_WTvsDEL2_TT <<- eBayes(fit_WTvsDEL2, trend = T, robust = T)
-
-	summary(decideTests(eBayes_WTvsDEL2_FF,adjust.method="BH",p.value=0.05))
-	#       (Intercept) conditionDEL
-	#Down             0            1
-	#NotSig          34        62975
-	#Up           62942            0
-
-	topTable(eBayes_WTvsDEL2_FF,adjust.method="BH",p.value=0.05)
-	#Removing intercept from test coefficients
-	#      Row Col Start
-	#46707 285 131   828
-	#                                                         Sequence ProbeUID
-	#46707 GCTTCCAGGGCTTATAACTTAATTGGTACGGTGTCATTTAAGTTTCGCATTAGCCCATGA    43540
-	#     ControlType     ProbeName  GeneName SystematicName
-	#46707           0 A_33_P3310966 LINC01503       AK092192
-	#                                                            Description
-	#46707 gb|Homo sapiens cDNA FLJ34873 fis, clone NT2NE2014950. [AK092192]
-	#          logFC  AveExpr        t      P.Value  adj.P.Val        B
-	#46707 -3.954283 1.800412 -11.6055 6.966373e-07 0.04387143 -4.28405
-
-
-
-	summary(decideTests(eBayes_WTvsDEL2_TF,adjust.method="BH",p.value=0.05))
-	#       (Intercept) conditionDEL
-	#Down             0            0
-	#NotSig          32        62976
-	#Up           62944            0
-
-
-	summary(decideTests(eBayes_WTvsDEL2_TT,adjust.method="BH",p.value=0.05))
-	#       (Intercept) conditionDEL
-	#Down             0            0
-	#NotSig          39        62976
-	#Up           62937            0
-
+	fit_WTvsDEL2 <<- lmFit(temp_data,designWTvsDEL)
+	eBayess_WTvsDEL2 <<- do_eBayess(fit_WTvsDEL2,printDEgenes)
 }
 
 #pdf("Test.pdf")
 #plotSA(fit, main="Probe-level")
 #dev.off()
 
+doDEG = function(my_data, cmpLevel, str_contrasts, exclude = c(), printDEgenes=FALSE){
+	data_colnames = colnames(my_data)
+	to_exclude = !(data_colnames %in% exclude)
+	if (sum(to_exclude) < length(colnames(my_data))) {
+		temp_data = my_data
+		temp_data$targets = as.data.frame(my_data$targets[to_exclude,])
+		rownames(temp_data$targets) = rownames(my_data$targets)[to_exclude]
+		colnames(temp_data$targets) = colnames(my_data$targets)
+		temp_data$E = temp_data$E[,to_exclude]
+		temp_design = my_design[to_exclude,]
+		for (i in names(temp_design)){
+			temp_design[[i]] = factor(temp_design[[i]])
+		}
+	}
+	else {
+		temp_data <<- my_data
+		temp_design = my_design
+		for (i in names(temp_design)){
+			temp_design[[i]] = factor(temp_design[[i]])
+		}
+	}
+	
+	print (paste("Running DEG for contrasts ",str_contrasts," on levels"))
+	print (levels(temp_design[[cmpLevel]]))
+	my_model_matrix = model.matrix(~0+temp_design[[cmpLevel]])
+	colnames(my_model_matrix) = levels(temp_design[[cmpLevel]])
+	temp_contrasts = makeContrasts(contrasts = str_contrasts, levels = my_model_matrix)
+	fitted_model <<- lmFit(temp_data,my_model_matrix)
+	fitted_contrasts <<- contrasts.fit(fitted_model,temp_contrasts)
+	return(do_eBayess(fitted_contrasts,printDEgenes))
+}
 
-my_plotPCA = function(fit_genotype){
+my_plotPCA = function(some_data){
 	#This code is based on example https://rstudio-pubs-static.s3.amazonaws.com/98999_50e28d4bc1324523899f9b27949ba4fd.html
-	data_transposed = aperm(fit_genotype$coefficients)
+	data_transposed = aperm(some_data)
 	pca <- prcomp(data_transposed, scale=T, center = T)
 	xlab = paste("PC1",as.character(pca$sdev[1]^2/sum(pca$sdev^2)))
 	ylab = paste("PC2",as.character(pca$sdev[2]^2/sum(pca$sdev^2)))
@@ -195,12 +193,11 @@ my_plotPCA = function(fit_genotype){
 	print(summary(pca))
 }
 
-my_correlations = function(fit_genotype, top = 0.15){
+my_correlations = function(some_data, top = 0.15){
 	#This code is based on example https://rstudio-pubs-static.s3.amazonaws.com/98999_50e28d4bc1324523899f9b27949ba4fd.html
-  library(gplots)
-	mydata = fit_genotype$coefficients
-	#remove 0 and negative values
-	
+	library(gplots)
+	mydata = some_data
+
 	#lets use only top % if DEGs
 	vars = apply(mydata,1,sd)
 	thrhold = quantile(vars, 1-top) 
@@ -217,9 +214,12 @@ my_correlations = function(fit_genotype, top = 0.15){
 	        symm=F,symkey=F,symbreaks=F, scale="none")
 }
 
-my_plotExpression = function(fit,geneName,save_path="results/",plotAll=T){
+my_plotExpression = function(fit,geneName,save_path="results/"){
   library(tidyr)
   library(ggplot2)
+  if (is.null(fit$s2.post)){
+	b = eBayes(fit)
+  }
   SE <- sqrt(fit$s2.post) * fit$stdev.unscaled  
   genePos = which(fit$genes$GeneName %in% c(geneName))
 
@@ -245,6 +245,36 @@ my_plotExpression = function(fit,geneName,save_path="results/",plotAll=T){
     theme(panel.grid.major = element_line(colour = "gray",linetype = "dashed"))
     )
   dev.off()
+}
+
+my_plotExpression2 = function(some_data,geneName,save_path="results/"){
+	library(tidyr)
+	library(dplyr)
+	library(ggplot2)
+	genePos = which(some_data$genes$GeneName %in% c(geneName))
+	temp = 2^some_data$E[genePos,,drop=F]
+	temp = t(temp)
+	cnames = colnames(temp)
+	temp = cbind(as.data.frame(temp),as.matrix(my_design$Name))
+	colnames(temp) = c(cnames,"Replica")
+	library(dplyr)
+	exprs = aggregate(temp[,-ncol(temp)],list(temp$Replica), mean)
+	sderrs = aggregate(temp[,-ncol(temp)],list(temp$Replica), sd)
+	exprs = gather(exprs,key="Group.1")
+	colnames(exprs) = c("Line","Probe","LogExpression")
+	sderrs = gather(sderrs,key="Group.1")
+	colnames(sderrs) = c("Line","Probe","SD")
+	exprs$SD = sderrs$SD
+	
+	pdf(paste(paste(save_path,geneName,sep="/"),"Log2.pdf",sep="."))
+	print(ggplot(data=exprs,mapping = aes(x=Line,y=LogExpression))+
+		geom_point()+
+		geom_errorbar(aes(ymin=LogExpression-SD, ymax=LogExpression+SD),width=.1)+
+		theme(panel.grid.major = element_line(colour = "gray",linetype = "dashed"))+
+		scale_y_continuous(trans='log2')
+		)
+	dev.off()
+
 }
 
 #https://support.bioconductor.org/p/70175/
