@@ -1,45 +1,73 @@
-my_loadAndNormalize_data = function(data_path,my_design,infile = NULL,averageDups = T, doDensityPlot = F){
+my_loadAndNormalize_data = function(my_design,infile = NULL, averageDups = T, doDensityPlot = F){
 #Load and normalize data
   if (!is.null(infile)){
      print ("Loading data from file")
      load(file=infile)    
      return (my_data)
-#    load(file=)
   }
   else{
-	my_data = read.maimages(my_design$FileName,path=data_path,source="agilent",green.only=T,
-							names=paste(1:length(my_design$Name),my_design$Name,sep="."))
-	my_data = backgroundCorrect(my_data,method="normexp")
-	if (doDensityPlot){
-		plotDensities(my_data)
-		title("Before")
-	}
-	my_data = normalizeBetweenArrays(my_data,method="quantile")
-	if (averageDups){
-		my_data = avereps(my_data,my_data$genes[,"ProbeUID"])
-	}
-	if (doDensityPlot){
-		plotDensities(my_data)
-		title("After")
-	}
-	return (my_data)
+    	my_data = read.maimages(my_design$FileName,source="agilent",green.only=T,
+    							names=paste(1:length(my_design$Name),my_design$Name,sep="."))
+    	my_data = backgroundCorrect(my_data,method="normexp")
+    	if (doDensityPlot){
+    		plotDensities(my_data)
+    		title("Before")
+    	}
+    	my_data = normalizeBetweenArrays(my_data,method="quantile")
+    	if (averageDups){
+    		my_data = avereps(my_data,my_data$genes[,"ProbeUID"])
+    	}
+    	if (doDensityPlot){
+    		plotDensities(my_data)
+    		title("After")
+    	}
+    	return (my_data)
   }	
+}
+
+
+remove_glia = function (my_data,my_design){
+  glia = (my_design$Condition == "GLIA")
+  neg = max(my_data$E[my_data$genes$ControlType==-1,])
+  glia_genes = apply(my_data$E[,c("14.mGlia","13.mGlia")],1,max)>neg
+  
+  glia_cols = !(colnames(my_data$E) %in% c("14.mGlia","13.mGlia"))
+  
 }
 
 #################### By genotype comparisons ######################
 
-do_eBayess = function(fit,printDEgenes){
+do_eBayess = function(fit, deGenesWb = NULL, sheetNames = c()){
 	eBayess = list()
+	sheetInd = 0
+
 	for (trend in c(F,T)) {
 	  for (robust in c(F,T)){
 	    name = paste("trend",as.character(trend),"robust",as.character(robust),sep=".")
       eBayess[[name]] = eBayes(fit,trend = trend, robust = robust)
       print (paste("Options trend =",trend,"robust=",robust))
       print(summary(decideTests(eBayess[[name]],adjust.method="BH",p.value=0.05)))
-      if (printDEgenes) {
+      if (!is.null(deGenesWb)) {
+        ind = 0
+        if (length(sheetNames) != length(colnames(eBayess[[name]]$contrasts))){
+          sheetNames = colnames(eBayess[[name]]$contrasts)
+          }
         for (coeff in colnames(eBayess[[name]]$contrasts)){
-          print (paste("Comparison ",coeff))
-          write.table (topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff),sep="\t")
+          sheetInd = sheetInd + 1
+          ind = ind + 1
+          sheetName = paste(as.character(sheetInd),sheetNames[ind],sep="-")
+          print (sheetName)
+          sheet <- createSheet(deGenesWb,sheetName)
+          rows <-createRow(sheet,rowIndex=1)
+          sheetTitle <-createCell(rows, colIndex=1)
+          setCellValue(sheetTitle[[1,1]], coeff)
+          rows <-createRow(sheet,rowIndex=2)
+          sheetTitle <-createCell(rows, colIndex=1)
+          setCellValue(sheetTitle[[1,1]], paste("Trend=",as.character(trend),
+                                                "Robust=",as.character(robust)))
+          addDataFrame(as.data.frame(
+                      topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff)
+                        ),sheet,startRow=3,startColumn=1)
         }
       }
 	  }
@@ -148,27 +176,35 @@ wt_vs_del_comparisons = function(my_data,exclude=c(),printDEgenes=FALSE){
 #plotSA(fit, main="Probe-level")
 #dev.off()
 
-doDEG = function(my_data, cmpLevel, str_contrasts, exclude = c(), printDEgenes=FALSE){
-	data_colnames = colnames(my_data)
-	to_exclude = !(data_colnames %in% exclude)
-	if (sum(to_exclude) < length(colnames(my_data))) {
-		temp_data = my_data
-		temp_data$targets = as.data.frame(my_data$targets[to_exclude,])
-		rownames(temp_data$targets) = rownames(my_data$targets)[to_exclude]
-		colnames(temp_data$targets) = colnames(my_data$targets)
-		temp_data$E = temp_data$E[,to_exclude]
-		temp_design = my_design[to_exclude,]
-		for (i in names(temp_design)){
-			temp_design[[i]] = factor(temp_design[[i]])
-		}
-	}
-	else {
-		temp_data <<- my_data
-		temp_design = my_design
-		for (i in names(temp_design)){
-			temp_design[[i]] = factor(temp_design[[i]])
-		}
-	}
+exclude_data = function(my_data, exclude){
+  data_colnames = colnames(my_data)
+  to_exclude = !(data_colnames %in% exclude)
+  if (sum(to_exclude) < length(colnames(my_data))) {
+    temp_data = my_data
+    temp_data$targets = as.data.frame(my_data$targets[to_exclude,])
+    rownames(temp_data$targets) = rownames(my_data$targets)[to_exclude]
+    colnames(temp_data$targets) = colnames(my_data$targets)
+    temp_data$E = temp_data$E[,to_exclude]
+    temp_design = my_design[to_exclude,]
+    for (i in names(temp_design)){
+      temp_design[[i]] = factor(temp_design[[i]])
+    }
+  }
+  else {
+    temp_data <<- my_data
+    temp_design = my_design
+    for (i in names(temp_design)){
+      temp_design[[i]] = factor(temp_design[[i]])
+    }
+  }
+  res = list(temp_data=temp_data,temp_design=temp_design)
+  return(res)
+}
+
+doDEG = function(my_data, cmpLevel, str_contrasts, exclude = c(), deGenesWb=NULL){
+	excluded = exclude_data(my_data,exclude)
+	temp_data = excluded$temp_data
+	temp_design = excluded$temp_design
 	
 	print (paste("Running DEG for contrasts ",str_contrasts," on levels"))
 	print (levels(temp_design[[cmpLevel]]))
@@ -177,12 +213,12 @@ doDEG = function(my_data, cmpLevel, str_contrasts, exclude = c(), printDEgenes=F
 	temp_contrasts = makeContrasts(contrasts = str_contrasts, levels = my_model_matrix)
 	fitted_model <<- lmFit(temp_data,my_model_matrix)
 	fitted_contrasts <<- contrasts.fit(fitted_model,temp_contrasts)
-	return(do_eBayess(fitted_contrasts,printDEgenes))
+	return(do_eBayess(fitted_contrasts,deGenesWb = deGenesWb))
 }
 
 my_plotPCA = function(some_data){
-	#This code is based on example https://rstudio-pubs-static.s3.amazonaws.com/98999_50e28d4bc1324523899f9b27949ba4fd.html
-	data_transposed = aperm(some_data)
+
+  data_transposed = aperm(some_data)
 	pca <- prcomp(data_transposed, scale=T, center = T)
 	xlab = paste("PC1",as.character(pca$sdev[1]^2/sum(pca$sdev^2)))
 	ylab = paste("PC2",as.character(pca$sdev[2]^2/sum(pca$sdev^2)))
@@ -247,15 +283,18 @@ my_plotExpression = function(fit,geneName,save_path="results/"){
   dev.off()
 }
 
-my_plotExpression2 = function(some_data,geneName,save_path="results/"){
+my_plotExpression2 = function(some_data,geneName,save_path="results/",exclude=c()){
 	library(tidyr)
 	library(dplyr)
 	library(ggplot2)
+  excluded = exclude_data(some_data,exclude)
+  some_data = excluded$temp_data
+  temp_design = excluded$temp_design
 	genePos = which(some_data$genes$GeneName %in% c(geneName))
 	temp = 2^some_data$E[genePos,,drop=F]
 	temp = t(temp)
 	cnames = colnames(temp)
-	temp = cbind(as.data.frame(temp),as.matrix(my_design$Name))
+	temp = cbind(as.data.frame(temp),as.matrix(temp_design$Name))
 	colnames(temp) = c(cnames,"Replica")
 	library(dplyr)
 	exprs = aggregate(temp[,-ncol(temp)],list(temp$Replica), mean)
@@ -270,7 +309,8 @@ my_plotExpression2 = function(some_data,geneName,save_path="results/"){
 	print(ggplot(data=exprs,mapping = aes(x=Line,y=LogExpression))+
 		geom_point()+
 		geom_errorbar(aes(ymin=LogExpression-SD, ymax=LogExpression+SD),width=.1)+
-		theme(panel.grid.major = element_line(colour = "gray",linetype = "dashed"))+
+		theme(panel.grid.major = element_line(colour = "gray",linetype = "dashed"),
+		      axis.text.x = element_text(angle = 90, hjust = 1))+
 		scale_y_continuous(trans='log2')
 		)
 	dev.off()

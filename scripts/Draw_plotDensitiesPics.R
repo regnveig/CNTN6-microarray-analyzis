@@ -1,7 +1,7 @@
-> library(limma)
-> setwd("~/Projects/CNTN6_microarray/")
-                          > my_design = read.table(paste(data_path,"2017-12-targets.txt",sep=""),header=T) 
-                          > data_path = "/mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data/"    )
+library(limma)
+setwd("~/Projects/CNTN6_microarray/")
+my_design = read.table(paste(data_path,"2017-12-targets.txt",sep=""),header=T) 
+data_path = ("/mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data/")
 my_data = read.maimages(my_design$FileName,path=data_path,source="agilent",g 
                             
                             Read /mnt/storage/home/vsfishman/Projects/CNTN6_microarray/data//SG11464135_257236314153_S001_GE1_1105_Oct12_1_1.txt 
