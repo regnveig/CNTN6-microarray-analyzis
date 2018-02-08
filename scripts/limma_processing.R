@@ -1,3 +1,7 @@
+colors = c("aliceblue","antiquewhite2","antiquewhite4","blue","black","azure3",
+           "brown","chartreuse","burlywood4","chocolate4","hotpink","lightgoldenrodyellow",
+           "limegreen","orange3","gray72","lightpink3","gray17","sienna1")
+
 my_loadAndNormalize_data = function(my_design,infile = NULL, averageDups = T, doDensityPlot = F){
 #Load and normalize data
   if (!is.null(infile)){
@@ -10,7 +14,7 @@ my_loadAndNormalize_data = function(my_design,infile = NULL, averageDups = T, do
     							names=paste(1:length(my_design$Name),my_design$Name,sep="."))
     	my_data = backgroundCorrect(my_data,method="normexp")
     	if (doDensityPlot){
-    		plotDensities(my_data)
+    		plotDensities(my_data, col = colors[1:ncol(my_data$E)], legend = "bottomright")
     		title("Before")
     	}
     	my_data = normalizeBetweenArrays(my_data,method="quantile")
@@ -18,7 +22,7 @@ my_loadAndNormalize_data = function(my_design,infile = NULL, averageDups = T, do
     		my_data = avereps(my_data,my_data$genes[,"ProbeUID"])
     	}
     	if (doDensityPlot){
-    		plotDensities(my_data)
+    		plotDensities(my_data, col = colors[1:ncol(my_data$E)], legend = "bottomright")
     		title("After")
     	}
     	return (my_data)
@@ -30,14 +34,14 @@ remove_glia = function (my_data,my_design){
   glia = (my_design$Condition == "GLIA")
   neg = max(my_data$E[my_data$genes$ControlType==-1,])
   glia_genes = apply(my_data$E[,c("14.mGlia","13.mGlia")],1,max)>neg
-  
   glia_cols = !(colnames(my_data$E) %in% c("14.mGlia","13.mGlia"))
-  
+  new_data = my_data[!glia_genes,]
+  return (new_data)
 }
 
 #################### By genotype comparisons ######################
 
-do_eBayess = function(fit, deGenesWb = NULL, sheetNames = c()){
+do_eBayess = function(fit, deGenesWb = NULL, lfc=1, sheetNames = c()){
 	eBayess = list()
 	sheetInd = 0
 
@@ -66,7 +70,7 @@ do_eBayess = function(fit, deGenesWb = NULL, sheetNames = c()){
           setCellValue(sheetTitle[[1,1]], paste("Trend=",as.character(trend),
                                                 "Robust=",as.character(robust)))
           addDataFrame(as.data.frame(
-                      topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff)
+                      topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff,lfc=lfc)
                         ),sheet,startRow=3,startColumn=1)
         }
       }
@@ -201,11 +205,10 @@ exclude_data = function(my_data, exclude){
   return(res)
 }
 
-doDEG = function(my_data, cmpLevel, str_contrasts, exclude = c(), deGenesWb=NULL){
+doDEG = function(my_data, cmpLevel, str_contrasts, lfc=1, exclude = c(), deGenesWb=NULL){
 	excluded = exclude_data(my_data,exclude)
 	temp_data = excluded$temp_data
 	temp_design = excluded$temp_design
-	
 	print (paste("Running DEG for contrasts ",str_contrasts," on levels"))
 	print (levels(temp_design[[cmpLevel]]))
 	my_model_matrix = model.matrix(~0+temp_design[[cmpLevel]])
@@ -213,7 +216,7 @@ doDEG = function(my_data, cmpLevel, str_contrasts, exclude = c(), deGenesWb=NULL
 	temp_contrasts = makeContrasts(contrasts = str_contrasts, levels = my_model_matrix)
 	fitted_model <<- lmFit(temp_data,my_model_matrix)
 	fitted_contrasts <<- contrasts.fit(fitted_model,temp_contrasts)
-	return(do_eBayess(fitted_contrasts,deGenesWb = deGenesWb))
+	return(do_eBayess(fitted_contrasts,lfc=lfc,deGenesWb = deGenesWb))
 }
 
 my_plotPCA = function(some_data){
