@@ -1,33 +1,33 @@
-colors = c("aliceblue","antiquewhite2","antiquewhite4","blue","black","azure3",
-           "brown","chartreuse","burlywood4","chocolate4","hotpink","lightgoldenrodyellow",
-           "limegreen","orange3","gray72","lightpink3","gray17","sienna1")
+# colors = c("aliceblue","antiquewhite2","antiquewhite4","blue","black","azure3",
+#            "brown","chartreuse","burlywood4","chocolate4","hotpink","lightgoldenrodyellow",
+#            "limegreen","orange3","gray72","lightpink3","gray17","sienna1")
 
-my_loadAndNormalize_data = function(my_design,infile = NULL, averageDups = T, doDensityPlot = F){
-#Load and normalize data
-  if (!is.null(infile)){
-     print ("Loading data from file")
-     load(file=infile)    
-     return (my_data)
-  }
-  else{
-    	my_data = read.maimages(my_design$FileName,source="agilent",green.only=T,
-    							names=paste(1:length(my_design$Name),my_design$Name,sep="."))
-    	my_data = backgroundCorrect(my_data,method="normexp")
-    	if (doDensityPlot){
-    		plotDensities(my_data, col = colors[1:ncol(my_data$E)], legend = "bottomright")
-    		title("Before")
-    	}
-    	my_data = normalizeBetweenArrays(my_data,method="quantile")
-    	if (averageDups){
-    		my_data = avereps(my_data,my_data$genes[,"ProbeUID"])
-    	}
-    	if (doDensityPlot){
-    		plotDensities(my_data, col = colors[1:ncol(my_data$E)], legend = "bottomright")
-    		title("After")
-    	}
-    	return (my_data)
-  }	
-}
+# my_loadAndNormalize_data = function(my_design,infile = NULL, averageDups = T, doDensityPlot = F){
+# #Load and normalize data
+#   if (!is.null(infile)){
+#      print ("Loading data from file")
+#      load(file=infile)    
+#      return (my_data)
+#   }
+#   else{
+#     	my_data = read.maimages(my_design$FileName,source="agilent",green.only=T,
+#     							names=paste(1:length(my_design$Name),my_design$Name,sep="."))
+#     	my_data = backgroundCorrect(my_data,method="normexp")
+#     	if (doDensityPlot){
+#     		plotDensities(my_data, col = colors[1:ncol(my_data$E)], legend = "bottomright")
+#     		title("Before")
+#     	}
+#     	my_data = normalizeBetweenArrays(my_data,method="quantile")
+#     	if (averageDups){
+#     		my_data = avereps(my_data,my_data$genes[,"ProbeUID"])
+#     	}
+#     	if (doDensityPlot){
+#     		plotDensities(my_data, col = colors[1:ncol(my_data$E)], legend = "bottomright")
+#     		title("After")
+#     	}
+#     	return (my_data)
+#   }	
+# }
 
 
 remove_glia = function (my_data,my_design){
@@ -41,116 +41,116 @@ remove_glia = function (my_data,my_design){
 
 #################### By genotype comparisons ######################
 
-do_eBayess = function(fit, deGenesWb = NULL, lfc=1, sheetNames = c()){
-	eBayess = list()
-	sheetInd = 0
-
-	for (trend in c(F,T)) {
-	  for (robust in c(F,T)){
-	    name = paste("trend",as.character(trend),"robust",as.character(robust),sep=".")
-      eBayess[[name]] = eBayes(fit,trend = trend, robust = robust)
-      print (paste("Options trend =",trend,"robust=",robust))
-      print(summary(decideTests(eBayess[[name]],adjust.method="BH",p.value=0.05)))
-      if (!is.null(deGenesWb)) {
-        ind = 0
-        if (length(sheetNames) != length(colnames(eBayess[[name]]$contrasts))){
-          sheetNames = colnames(eBayess[[name]]$contrasts)
-          }
-        for (coeff in colnames(eBayess[[name]]$contrasts)){
-          sheetInd = sheetInd + 1
-          ind = ind + 1
-          sheetName = paste(as.character(sheetInd),sheetNames[ind],sep="-")
-          print (sheetName)
-          sheet <- createSheet(deGenesWb,sheetName)
-          rows <-createRow(sheet,rowIndex=1)
-          sheetTitle <-createCell(rows, colIndex=1)
-          setCellValue(sheetTitle[[1,1]], coeff)
-          rows <-createRow(sheet,rowIndex=2)
-          sheetTitle <-createCell(rows, colIndex=1)
-          setCellValue(sheetTitle[[1,1]], paste("Trend=",as.character(trend),
-                                                "Robust=",as.character(robust)))
-          addDataFrame(as.data.frame(
-                      topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff,lfc=lfc)
-                        ),sheet,startRow=3,startColumn=1)
-        }
-      }
-	  }
-	}
-	return(eBayess)
-}
-
-by_genotype_comparisons = function(my_data, printDEgenes=F)
-{
-  print ("DGE comparison")
-  print(format(Sys.time(), "%a %b %d %X %Y"))
-  
-	my_design_matrix <<- model.matrix(~0+my_design$Name)
-
-	#my_design_matrix
-	#  my_design$NameiTAF1nor25 my_design$NameiTAF1nor36 my_design$NameiTAF2nor24
-	#1                        0                        1                        0
-	#2                        0                        1                        0
-	#3                        1                        0                        0
-	#4                        1                        0                        0
-	#5                        0                        0                        1
-	#6                        0                        0                        1
-	#7                        0                        0                        0
-	#8                        0                        0                        0
-	#  my_design$NameiTAF3del17
-	#1                        0
-	#2                        0
-	#3                        0
-	#4                        0
-	#5                        0
-	#6                        0
-	#7                        1
-	#8                        1
-
-
-	colnames(my_design_matrix) = levels(my_design$Name)
-	#colnames(my_design_matrix) = c("(Intercept)",levels(my_design$Name))
-
-	#  iTAF1nor25 iTAF1nor36 iTAF2nor24 iTAF3del17
-	#1          0          1          0          0
-	#2          0          1          0          0
-	#3          1          0          0          0
-	#4          1          0          0          0
-	#5          0          0          1          0
-	#6          0          0          1          0
-	#7          0          0          0          1
-	#8          0          0          0          1
-	#attr(,"assign")
-	#[1] 1 1 1 1
-	#attr(,"contrasts")
-	#attr(,"contrasts")$`my_design$Name`
-	#[1] "contr.treatment"
-
-
-	PairWizeWTvsDelContrasts <<- makeContrasts(
-						vs25 = iTAF1nor25 - iTAF3del17,
-						vs36 = iTAF1nor36 - iTAF3del17,
-						vs24 =  iTAF2nor24 - iTAF3del17,
-						levels = my_design_matrix)
-
-	fit_genotype <<- lmFit(my_data,my_design_matrix)
-
-	fit_genotype_pairs <<- contrasts.fit(fit_genotype,PairWizeWTvsDelContrasts)
-	eBayess_by_genotype <<- do_eBayess(fit_genotype_pairs,printDEgenes)
-
-	print ("Compare del with all of wt simultaneously")
-	allNormVSDel <<- makeContrasts(iTAF1nor25+iTAF1nor36+iTAF2nor24-(iTAF3del17*3),
-									levels = my_design_matrix)
-									
-	fit_WTvsDEL <<- contrasts.fit(fit_genotype,allNormVSDel)
-	eBayess_WTvsDEL <<- do_eBayess(fit_WTvsDEL,printDEgenes)
-	
-	PairWizeWTvsWTContrasts = makeContrasts(c36vs24 = iTAF1nor36 - iTAF2nor24,
-	                                           c36vs25 = iTAF1nor36 - iTAF1nor25,
-	                                           c25vs24 = iTAF1nor25 - iTAF2nor24,
-	                                           levels = my_design_matrix)
-	fit_genotype_pairs_bwWT = contrasts.fit(fit_genotype,PairWizeWTvsWTContrasts)
-	eBayess_bwWt <<- do_eBayess(fit_genotype_pairs_bwWT,printDEgenes)
-}
+# do_eBayess = function(fit, deGenesWb = NULL, lfc=1, sheetNames = c()){
+# 	eBayess = list()
+# 	sheetInd = 0
+# 
+# 	for (trend in c(F,T)) {
+# 	  for (robust in c(F,T)){
+# 	    name = paste("trend",as.character(trend),"robust",as.character(robust),sep=".")
+#       eBayess[[name]] = eBayes(fit,trend = trend, robust = robust)
+#       print (paste("Options trend =",trend,"robust=",robust))
+#       print(summary(decideTests(eBayess[[name]],adjust.method="BH",p.value=0.05)))
+#       if (!is.null(deGenesWb)) {
+#         ind = 0
+#         if (length(sheetNames) != length(colnames(eBayess[[name]]$contrasts))){
+#           sheetNames = colnames(eBayess[[name]]$contrasts)
+#           }
+#         for (coeff in colnames(eBayess[[name]]$contrasts)){
+#           sheetInd = sheetInd + 1
+#           ind = ind + 1
+#           sheetName = paste(as.character(sheetInd),sheetNames[ind],sep="-")
+#           print (sheetName)
+#           sheet <- createSheet(deGenesWb,sheetName)
+#           rows <-createRow(sheet,rowIndex=1)
+#           sheetTitle <-createCell(rows, colIndex=1)
+#           setCellValue(sheetTitle[[1,1]], coeff)
+#           rows <-createRow(sheet,rowIndex=2)
+#           sheetTitle <-createCell(rows, colIndex=1)
+#           setCellValue(sheetTitle[[1,1]], paste("Trend=",as.character(trend),
+#                                                 "Robust=",as.character(robust)))
+#           addDataFrame(as.data.frame(
+#                       topTable(eBayess[[name]],number=Inf,p.value = 0.05,coef=coeff,lfc=lfc)
+#                         ),sheet,startRow=3,startColumn=1)
+#         }
+#       }
+# 	  }
+# 	}
+# 	return(eBayess)
+# }
+# 
+# by_genotype_comparisons = function(my_data, printDEgenes=F)
+# {
+#   print ("DGE comparison")
+#   print(format(Sys.time(), "%a %b %d %X %Y"))
+#   
+# 	my_design_matrix <<- model.matrix(~0+my_design$Name)
+# 
+# 	#my_design_matrix
+# 	#  my_design$NameiTAF1nor25 my_design$NameiTAF1nor36 my_design$NameiTAF2nor24
+# 	#1                        0                        1                        0
+# 	#2                        0                        1                        0
+# 	#3                        1                        0                        0
+# 	#4                        1                        0                        0
+# 	#5                        0                        0                        1
+# 	#6                        0                        0                        1
+# 	#7                        0                        0                        0
+# 	#8                        0                        0                        0
+# 	#  my_design$NameiTAF3del17
+# 	#1                        0
+# 	#2                        0
+# 	#3                        0
+# 	#4                        0
+# 	#5                        0
+# 	#6                        0
+# 	#7                        1
+# 	#8                        1
+# 
+# 
+# 	colnames(my_design_matrix) = levels(my_design$Name)
+# 	#colnames(my_design_matrix) = c("(Intercept)",levels(my_design$Name))
+# 
+# 	#  iTAF1nor25 iTAF1nor36 iTAF2nor24 iTAF3del17
+# 	#1          0          1          0          0
+# 	#2          0          1          0          0
+# 	#3          1          0          0          0
+# 	#4          1          0          0          0
+# 	#5          0          0          1          0
+# 	#6          0          0          1          0
+# 	#7          0          0          0          1
+# 	#8          0          0          0          1
+# 	#attr(,"assign")
+# 	#[1] 1 1 1 1
+# 	#attr(,"contrasts")
+# 	#attr(,"contrasts")$`my_design$Name`
+# 	#[1] "contr.treatment"
+# 
+# 
+# 	PairWizeWTvsDelContrasts <<- makeContrasts(
+# 						vs25 = iTAF1nor25 - iTAF3del17,
+# 						vs36 = iTAF1nor36 - iTAF3del17,
+# 						vs24 =  iTAF2nor24 - iTAF3del17,
+# 						levels = my_design_matrix)
+# 
+# 	fit_genotype <<- lmFit(my_data,my_design_matrix)
+# 
+# 	fit_genotype_pairs <<- contrasts.fit(fit_genotype,PairWizeWTvsDelContrasts)
+# 	eBayess_by_genotype <<- do_eBayess(fit_genotype_pairs,printDEgenes)
+# 
+# 	print ("Compare del with all of wt simultaneously")
+# 	allNormVSDel <<- makeContrasts(iTAF1nor25+iTAF1nor36+iTAF2nor24-(iTAF3del17*3),
+# 									levels = my_design_matrix)
+# 									
+# 	fit_WTvsDEL <<- contrasts.fit(fit_genotype,allNormVSDel)
+# 	eBayess_WTvsDEL <<- do_eBayess(fit_WTvsDEL,printDEgenes)
+# 	
+# 	PairWizeWTvsWTContrasts = makeContrasts(c36vs24 = iTAF1nor36 - iTAF2nor24,
+# 	                                           c36vs25 = iTAF1nor36 - iTAF1nor25,
+# 	                                           c25vs24 = iTAF1nor25 - iTAF2nor24,
+# 	                                           levels = my_design_matrix)
+# 	fit_genotype_pairs_bwWT = contrasts.fit(fit_genotype,PairWizeWTvsWTContrasts)
+# 	eBayess_bwWt <<- do_eBayess(fit_genotype_pairs_bwWT,printDEgenes)
+# }
 
 #################### WT ws DEL ######################
 wt_vs_del_comparisons = function(my_data,exclude=c(),printDEgenes=FALSE){
