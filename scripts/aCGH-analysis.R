@@ -7,6 +7,7 @@ library(rjson)
 library(stringr)
 library(tidyr)
 library(xlsx)
+library(maptools)
 
 PlotColors = c("aliceblue", "antiquewhite2", "antiquewhite4", "blue", "black",
 			   "azure3", "brown", "chartreuse", "burlywood4", "chocolate4",
@@ -90,9 +91,9 @@ PlotPCA = function(Data) {
 	pca = prcomp(TransposedData, scale=T, center=T)
 	xlab = paste("PC1", as.character(pca$sdev[1] ^ 2 / sum(pca$sdev ^ 2)))
 	ylab = paste("PC2", as.character(pca$sdev[2] ^ 2 / sum(pca$sdev ^ 2)))
-	plot(pca$x, type="n", xlab=xlab, ylab=ylab)
+	plot(pca$x, type="p", col="blue", xlab=xlab, ylab=ylab, pch=25, lwd=2)
+	text(pca$x, labels=rownames(pca$x), pos=3, offset=0.9)
 	title("PCA");
-	text(pca$x, rownames(pca$x), cex=0.5)
 	plot.new()
 	grid.table(as.data.frame(t(summary(pca)$importance)))
 	title("PCA Summary Importance");
@@ -105,7 +106,7 @@ PlotCorrelations = function(Data, top=0.15) {
 	Data = Data[Vars > thrhold,]
 	pearsonCorr = as.dist(1 - cor(Data))
 	hC = hclust(pearsonCorr)
-	plot(hC)
+	plot(hC, hang=-1)
 	heatmap.2(as.matrix(Data),
 		  dendrogram="column",
 		  trace="none",
