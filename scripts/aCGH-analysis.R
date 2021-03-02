@@ -1,15 +1,22 @@
+options(java.parameters = "-Xmx8000m")
+
+library(gplots, warn.conflicts=F)
+library(gridExtra)
 library(limma)
-library(xlsx)
+library(rjson)
 library(stringr)
 library(tidyr)
+library(xlsx)
 
 PlotColors = c("aliceblue", "antiquewhite2", "antiquewhite4", "blue", "black",
 			   "azure3", "brown", "chartreuse", "burlywood4", "chocolate4",
 			   "hotpink", "lightgoldenrodyellow", "limegreen", "orange3",
 			   "gray72", "lightpink3", "gray17", "sienna1")
 
+# I/O
+
 ReadDesign = function(FileName) { return(read.table(FileName, header=T)) }
-ReadTargets = function(Design) { return(read.maimages(Design$FileName, source="agilent", green.only=T, names=paste(1:length(Design$Name), Design$Name, sep="."))) }
+ReadTargets = function(Design) { return(read.maimages(Design$FileName, source="agilent", green.only=T, names=paste(1:length(Design$Name), Design$Name, sep="."), verbose=F)) }
 SaveData = function(Data, FileName) { save(Data,file=FileName) }
 LoadData = function(FileName) { return(load(file=FileName)) }
 
@@ -17,11 +24,15 @@ LoadData = function(FileName) { return(load(file=FileName)) }
 
 NormalizeData = function(Data, averageDups=T) {
 	
-	Data = backgroundCorrect(Data, method="normexp")
-	plotDensities(Data, col=PlotColors[1:ncol(Data$E)], legend="bottomright"); title("Densities [before]");
+	Data = backgroundCorrect(Data, method="normexp", verbose=F)
+	DataBefore = Data
 	Data = normalizeBetweenArrays(Data, method="quantile")
 	if (averageDups) { Data = avereps(Data, Data$genes[,"ProbeName"]) }
-	plotDensities(Data, col=PlotColors[1:ncol(Data$E)], legend="bottomright"); title("Densities [after]");
+	DataAfter = Data
+	par(mfrow = c(2, 1))
+	plotDensities(DataBefore, col=PlotColors[1:ncol(Data$E)], legend="bottomright"); title("Densities [before]");
+	plotDensities(DataAfter, col=PlotColors[1:ncol(Data$E)], legend="bottomright"); title("Densities [after]");
+	par(mfrow = c(1, 1))
 	return(Data)
 }
 
@@ -61,29 +72,80 @@ MakeeBayess = function(Fit, ResultXlsx, lfc=1) {
 	}
 }
 
-# COMPARISON BY GT
+# COMPARISON
 
-ComparisonByGenotype = function(Data, Design, Contrasts, ResultXlsx) {
-	DesignMatrix = model.matrix(~ 0 + Design$Name)
-	colnames(DesignMatrix) = levels(Design$Name)
+ComparisonDEG = function(Data, Design, Level, Contrasts, ResultXlsx) {
+	DesignMatrix = model.matrix(~ 0 + Design[[Level]])
+	colnames(DesignMatrix) = levels(Design[[Level]])
 	FitGenotype = lmFit(Data, DesignMatrix)
 	MadeContrasts = makeContrasts(contrasts=Contrasts, levels=DesignMatrix)
 	ContrastsFit = contrasts.fit(FitGenotype, MadeContrasts)
 	MakeeBayess(ContrastsFit, ResultXlsx)
 }
 
-# ----------------------------
+# PLOTTING
 
-# help(make.names)
-# q()
-Design = ReadDesign("/dev/datasets/FairWind/.cloud/core/CNTN6-microarray-analyzis/datasets/Tomsk_202101/Targets.list")
-Data = ReadTargets(Design)
+PlotPCA = function(Data) {
+	TransposedData = aperm(Data)
+	pca = prcomp(TransposedData, scale=T, center=T)
+	xlab = paste("PC1", as.character(pca$sdev[1] ^ 2 / sum(pca$sdev ^ 2)))
+	ylab = paste("PC2", as.character(pca$sdev[2] ^ 2 / sum(pca$sdev ^ 2)))
+	plot(pca$x, type="n", xlab=xlab, ylab=ylab)
+	title("PCA");
+	text(pca$x, rownames(pca$x), cex=0.5)
+	plot.new()
+	grid.table(as.data.frame(t(summary(pca)$importance)))
+	title("PCA Summary Importance");
+}
 
-pdf("/dev/datasets/FairWind/.cloud/core/CNTN6-microarray-analyzis/datasets/Tomsk_202101/re.pdf")
+PlotCorrelations = function(Data, top=0.15) {
+	#This code is based on example https://rstudio-pubs-static.s3.amazonaws.com/98999_50e28d4bc1324523899f9b27949ba4fd.html
+	Vars = apply(Data, 1, sd)
+	thrhold = quantile(Vars, 1 - top) 
+	Data = Data[Vars > thrhold,]
+	pearsonCorr = as.dist(1 - cor(Data))
+	hC = hclust(pearsonCorr)
+	plot(hC)
+	heatmap.2(as.matrix(Data),
+		  dendrogram="column",
+		  trace="none",
+		  col=greenred(100),
+		  main=paste("Heatmap of top", as.character(top * 100), "% variative genes"),
+		  symm=F,
+		  symkey=F,
+		  symbreaks=F,
+		  scale="none")
+}
 
-Data = NormalizeData(Data)
+# MAIN
 
-wb<-createWorkbook(type="xlsx")
-ComparisonByGenotype(Data, Design, c("s13_26-s14_10", "s13_27-s14_10", "s13_26-s13_27"), ResultXlsx=wb)
-saveWorkbook(wb, "DEGexSamplesGLIA.xlsx")
-dev.off()
+aCGH.Analysis = function(Options, log=NULL) {
+	Report = toJSON(Options, indent=6, method="C")
+	cat(Report)
+	Vectorize = function(Line) { return(unlist(lapply(Line, function(x) { if (typeof(x) == "list") { paste(unlist(x), collapse='; ') } else { as.character(x) } }), recursive=FALSE)) }
+	if (!is.null(log)) {
+		if (file.exists(log)) {
+			write(Vectorize(Options), ncolumns=length(Options), sep="\t", file=log, append=TRUE)
+		} else {
+			write(names(Options), ncolumns=length(Options), sep="\t", file=log, append=FALSE)
+			write(Vectorize(Options), ncolumns=length(Options), sep="\t", file=log, append=TRUE)
+		}
+	}
+	PlotsPDF = file.path(Options$OutputDir, paste(Options$TimeStamp, "_plots.pdf"))
+	ComparisonXLS = file.path(Options$OutputDir, paste(Options$TimeStamp, "_comparisons.xls"))
+	Design = ReadDesign(Options$TargetsList)
+	if (length(Options$Excluded) > 0) Design = Design[- unlist(Options$Excluded), ]
+	Data = ReadTargets(Design)
+	if (Options$Plots) pdf(PlotsPDF, width=8, height=11)
+	Data = NormalizeData(Data)
+	if (Options$Plots) {
+		PlotPCA(Data$E)
+		PlotCorrelations(Data$E)
+		dev.null = dev.off()
+	}
+	if (Options$Comparisons) {
+		ComparisonWorkBook = createWorkbook(type="xls")
+		ComparisonDEG(Data, Design, Options$Level, unlist(Options$Contrasts), ComparisonWorkBook)
+		saveWorkbook(ComparisonWorkBook, ComparisonXLS)
+	}
+}
