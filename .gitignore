@@ -4,7 +4,7 @@ datasets
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
-*.log
+*.log.tsv
 
 # Folder config file
 Desktop.ini

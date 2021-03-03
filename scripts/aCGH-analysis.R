@@ -1,13 +1,17 @@
 options(java.parameters = "-Xmx8000m")
 
-library(gplots, warn.conflicts=F)
+library(conflicted)
+library(dplyr)
+library(gplots)
+library(ggplot2)
 library(gridExtra)
 library(limma)
+library(maptools); gpclibPermit()
 library(rjson)
+library(sp)
 library(stringr)
 library(tidyr)
 library(xlsx)
-library(maptools)
 
 PlotColors = c("aliceblue", "antiquewhite2", "antiquewhite4", "blue", "black",
 			   "azure3", "brown", "chartreuse", "burlywood4", "chocolate4",
@@ -118,6 +122,32 @@ PlotCorrelations = function(Data, top=0.15) {
 		  scale="none")
 }
 
+AggreGather = function(Data, FUN, ColName) {
+	Data = aggregate(Data[, -ncol(Data)], list(Data[, "Line"]), FUN, drop=FALSE)
+	Data$Line = Data$Group.1
+	Data = gather(Data, key="Group.1", value="value", -Line, -Group.1, na.rm=FALSE)
+	colnames(Data)[colnames(Data) == "Group.1"] = "Probe"
+	colnames(Data)[colnames(Data) == "value"] = ColName
+	return(Data)
+}
+
+PlotGeneExpression = function(Data, Design, GeneName, namesColumn) {
+	GenePos = which(Data$genes[[namesColumn]] == GeneName)
+	TempData = t(2 ^ Data$E[GenePos, , drop=F])
+	ColNames = colnames(TempData)
+	TempData = cbind(as.data.frame(TempData), as.matrix(Design$Name))
+	colnames(TempData) = c(ColNames, "Line")
+	Exprs = AggreGather(TempData, function(x) base::mean(x, na.rm=TRUE), "LogExpression")
+	SDErrs = AggreGather(TempData, function(x) stats::sd(x, na.rm=TRUE), "SD")
+	Exprs = merge(Exprs, SDErrs, by=c("Line", "Probe"))
+	print(ggplot(data=Exprs, mapping=aes(x=Line, y=LogExpression)) +
+	    ggtitle(paste("Expression of", GeneName)) +
+		geom_point(size=5) +
+		geom_errorbar(aes(ymin=LogExpression-SD, ymax=LogExpression+SD), width=.1) +
+		theme(panel.grid.major=element_line(colour="gray", linetype="dashed"), axis.text.x=element_text(angle=90, hjust=1), plot.title=element_text(size=24, face="bold")) +
+		scale_y_continuous(trans='log2'))
+}
+
 # MAIN
 
 aCGH.Analysis = function(Options, log=NULL) {
@@ -138,10 +168,12 @@ aCGH.Analysis = function(Options, log=NULL) {
 	if (length(Options$Excluded) > 0) Design = Design[- unlist(Options$Excluded), ]
 	Data = ReadTargets(Design)
 	if (Options$Plots) pdf(PlotsPDF, width=8, height=11)
-	Data = NormalizeData(Data)
+	Data = NormalizeData(Data, averageDups=T)
+	print(Data)
 	if (Options$Plots) {
 		PlotPCA(Data$E)
 		PlotCorrelations(Data$E)
+		for (GN in unlist(Options$ExpressionGenes)) { PlotGeneExpression(Data, Design, GN, Options$GeneNameColumn) }
 		dev.null = dev.off()
 	}
 	if (Options$Comparisons) {
