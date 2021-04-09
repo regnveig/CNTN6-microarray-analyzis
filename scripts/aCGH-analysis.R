@@ -45,7 +45,7 @@ NormalizeData = function(Data, averageDups=T) {
 
 BT = function(Bool) { if (Bool) { return("T") } else { return("F") } }
 
-MakeeBayess = function(Fit, ResultXlsx, lfc=1) {
+MakeeBayess = function(Fit, ResultXlsx, AnnotationFile, lfc=1) {
 	eBayess = list()
 	sheetInd = 0
 	Set = 0
@@ -71,7 +71,11 @@ MakeeBayess = function(Fit, ResultXlsx, lfc=1) {
 				addDataFrame(data.frame(matrix(unlist(sheetTitle), nrow=length(sheetTitle), byrow=TRUE)), sheet, startRow=1, startColumn=1, col.names=F, row.names=F)
 				addDataFrame(data.frame(matrix(unlist(c(paste("# SUMMARY: ", name, sep=""))), nrow=1, byrow=TRUE)), SummarySheet, startRow=(Set - 1) * 6 + 1, startColumn=1, col.names=F, row.names=F)
 				addDataFrame(spread(as.data.frame(summary(decideTests(eBayess[[name]], adjust.method="BH", p.value=0.05))), key=Var2, value=Freq), SummarySheet, startRow=(Set - 1) * 6 + 2, startColumn=1, row.names=F)
-				addDataFrame(as.data.frame(topTable(eBayess[[name]], number=Inf, p.value=0.05, coef=coeff, lfc=lfc)), sheet, startRow=5, startColumn=1)
+				TT = as.data.frame(topTable(eBayess[[name]], number=Inf, p.value=0.05, coef=coeff, lfc=lfc))
+				AnnotationData = read.table(AnnotationFile, header=T)
+				TT = merge(TT, AnnotationData, by=c("ProbeName"))
+				rownames(TT) <- TT$ProbeName
+				addDataFrame(TT, sheet, startRow=5, startColumn=1)
 			}
 		}
 	}
@@ -79,13 +83,13 @@ MakeeBayess = function(Fit, ResultXlsx, lfc=1) {
 
 # COMPARISON
 
-ComparisonDEG = function(Data, Design, Level, Contrasts, ResultXlsx) {
+ComparisonDEG = function(Data, Design, Level, Contrasts, ResultXlsx, AnnotationFile) {
 	DesignMatrix = model.matrix(~ 0 + Design[[Level]])
 	colnames(DesignMatrix) = levels(Design[[Level]])
 	FitGenotype = lmFit(Data, DesignMatrix)
 	MadeContrasts = makeContrasts(contrasts=Contrasts, levels=DesignMatrix)
 	ContrastsFit = contrasts.fit(FitGenotype, MadeContrasts)
-	MakeeBayess(ContrastsFit, ResultXlsx)
+	MakeeBayess(ContrastsFit, ResultXlsx, AnnotationFile)
 }
 
 # PLOTTING
@@ -148,6 +152,23 @@ PlotGeneExpression = function(Data, Design, GeneName, namesColumn) {
 		scale_y_continuous(trans='log2'))
 }
 
+# DATA SUBSETTING
+
+ExcludeDesign = function(Design, Excluded) {
+	if (length(Options$Excluded) > 0) Design = Design[- unlist(Excluded), ]
+	return(Design)
+}
+
+ExpressedGenes = function(TargetsList, Samples) {
+	Design = ReadDesign(TargetsList)
+	Data = ReadTargets(Design)
+	Data = NormalizeData(Data, averageDups=T)
+	SamplesDesign = Design[unlist(Samples), ]
+	Neg = max(Data$E[Data$genes$ControlType == -1, ])
+	GenesList = apply(Data$E[, unlist(Samples)], 1, max) > Neg
+	return(GenesList)
+}
+
 # MAIN
 
 aCGH.Analysis = function(Options, log=NULL) {
@@ -165,11 +186,10 @@ aCGH.Analysis = function(Options, log=NULL) {
 	PlotsPDF = file.path(Options$OutputDir, paste(Options$TimeStamp, "_plots.pdf"))
 	ComparisonXLS = file.path(Options$OutputDir, paste(Options$TimeStamp, "_comparisons.xls"))
 	Design = ReadDesign(Options$TargetsList)
-	if (length(Options$Excluded) > 0) Design = Design[- unlist(Options$Excluded), ]
+	Design = ExcludeDesign(Design, Options$Excluded)
 	Data = ReadTargets(Design)
 	if (Options$Plots) pdf(PlotsPDF, width=8, height=11)
 	Data = NormalizeData(Data, averageDups=T)
-	print(Data)
 	if (Options$Plots) {
 		PlotPCA(Data$E)
 		PlotCorrelations(Data$E)
@@ -177,8 +197,9 @@ aCGH.Analysis = function(Options, log=NULL) {
 		dev.null = dev.off()
 	}
 	if (Options$Comparisons) {
+		if (length(Options$ExcludeExpressedGenesIn) > 0) Data = Data[!ExpressedGenes(Options$TargetsList, Options$ExcludeExpressedGenesIn), ]
 		ComparisonWorkBook = createWorkbook(type="xls")
-		ComparisonDEG(Data, Design, Options$Level, unlist(Options$Contrasts), ComparisonWorkBook)
+		ComparisonDEG(Data, Design, Options$Level, unlist(Options$Contrasts), ComparisonWorkBook, Options$AnnotationFile)
 		saveWorkbook(ComparisonWorkBook, ComparisonXLS)
 	}
 }
